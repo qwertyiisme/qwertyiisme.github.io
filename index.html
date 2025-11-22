@@ -3,12 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Современный портфолио с интерактивными элементами">
+    <meta name="description" content="Портфолио qwertyiisme - Full Stack Developer. Python, Machine Learning, Neural Networks, C++, C# разработчик">
+    <meta name="keywords" content="портфолио, разработчик, Python, Machine Learning, нейронные сети, программирование">
+    <meta name="author" content="qwertyiisme">
+    <meta name="theme-color" content="#667eea">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Портфолио | qwertyiisme">
+    <meta property="og:description" content="Full Stack Developer - Python, Machine Learning, Neural Networks">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="Портфолио | qwertyiisme">
+    <meta property="twitter:description" content="Full Stack Developer - Python, Machine Learning, Neural Networks">
+    
     <title>Портфолио | qwertyiisme</title>
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="styles.css" as="style">
+    <link rel="preload" href="script.js" as="script">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" as="style">
+    
+    <!-- Styles -->
     <link rel="stylesheet" href="styles.css">
+    
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"></noscript>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👨‍💻</text></svg>">
+    
+    <!-- Tone.js для генерации музыки -->
+    <script src="https://cdn.jsdelivr.net/npm/tone@14.7.77/build/Tone.js"></script>
 </head>
 <body>
     <!-- Навигация -->
@@ -24,6 +54,17 @@
                 <li><a href="#skills" class="nav-link">Навыки</a></li>
                 <li><a href="#contact" class="nav-link">Контакты</a></li>
             </ul>
+            <button class="music-toggle-btn-nav" id="musicToggleNav" aria-label="Включить/выключить музыку" title="Музыка">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="music-icon">
+                    <path d="M9 18V5l12-2v13"></path>
+                    <circle cx="6" cy="18" r="3"></circle>
+                    <circle cx="18" cy="16" r="3"></circle>
+                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="music-icon-muted" style="display: none;">
+                    <path d="M9 18V5l12-2v13"></path>
+                    <line x1="2" y1="2" x2="22" y2="22"></line>
+                </svg>
+            </button>
             <button class="theme-toggle" id="themeToggle" aria-label="Переключить тему">
                 <span class="theme-icon">🌙</span>
             </button>
@@ -463,6 +504,9 @@
             <p>&copy; 2025 qwertyiisme. Создано с ❤️.</p>
         </div>
     </footer>
+
+    <!-- Фоновый музыкальный плеер (Tone.js) -->
+    <div class="strudel-background-player" id="strudelBackground"></div>
 
     <script src="script.js"></script>
 </body>

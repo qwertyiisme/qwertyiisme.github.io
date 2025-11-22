@@ -45,6 +45,22 @@ navLinks.forEach(link => {
 });
 
 // ============================================
+// Performance Optimization: Debounce
+// ============================================
+
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// ============================================
 // Smooth Scroll & Active Navigation
 // ============================================
 
@@ -75,7 +91,9 @@ function updateActiveNav() {
     }
 }
 
-window.addEventListener('scroll', updateActiveNav);
+// Use optimized scroll handler with debounce
+const optimizedScrollHandler = debounce(updateActiveNav, 10);
+window.addEventListener('scroll', optimizedScrollHandler, { passive: true });
 updateActiveNav();
 
 // ============================================
@@ -377,7 +395,316 @@ document.addEventListener('keydown', (e) => {
 
 console.log('%c👋 Привет!', 'font-size: 20px; font-weight: bold; color: #667eea;');
 console.log('%cИсходный код этого сайта доступен на GitHub', 'font-size: 14px; color: #6c757d;');
-console.log('%cСоздано с ❤️ и кофе', 'font-size: 12px; color: #adb5bd;');
+console.log('%cСоздано с ❤️ qwertyiisme', 'font-size: 12px; color: #adb5bd;');
+
+// ============================================
+// Background Music (Tone.js)
+// ============================================
+
+// Расслабляющая ambient композиция с использованием Tone.js
+let musicEnabled = true;
+let musicPlayers = [];
+let isPlaying = false;
+
+async function initStrudelBackground() {
+    // Проверяем наличие Tone.js
+    if (typeof Tone === 'undefined') {
+        console.warn('Tone.js не загружен');
+        return;
+    }
+    
+    const musicToggleBtn = document.getElementById('musicToggleNav');
+    
+    // Загружаем сохраненное состояние музыки
+    const savedMusicState = localStorage.getItem('musicEnabled');
+    if (savedMusicState !== null) {
+        musicEnabled = savedMusicState === 'true';
+    }
+    
+    // Устанавливаем начальное состояние
+    updateMusicState();
+    
+    // Обработчик кнопки включения/выключения музыки
+    if (musicToggleBtn) {
+        musicToggleBtn.addEventListener('click', toggleMusic);
+    }
+    
+    // Инициализируем Tone.js после взаимодействия пользователя
+    let userInteracted = false;
+    let musicInitialized = false;
+    
+    const startMusic = async () => {
+        if (!userInteracted && musicEnabled) {
+            userInteracted = true;
+            if (!musicInitialized) {
+                musicInitialized = true;
+                await initMusic();
+            }
+        }
+    };
+    
+    // Слушаем любое взаимодействие пользователя
+    document.addEventListener('click', startMusic, { once: true });
+    document.addEventListener('keydown', startMusic, { once: true });
+    document.addEventListener('touchstart', startMusic, { once: true });
+    
+    // Также инициализируем при клике на кнопку музыки
+    if (musicToggleBtn) {
+        const originalToggle = musicToggleBtn.onclick;
+        musicToggleBtn.addEventListener('click', async () => {
+            if (!musicInitialized && typeof Tone !== 'undefined') {
+                musicInitialized = true;
+                await initMusic();
+            }
+        });
+    }
+    
+    console.log('🎵 Фоновый музыкальный плеер инициализирован');
+}
+
+async function initMusic() {
+    if (typeof Tone === 'undefined') {
+        console.error('Tone.js не загружен');
+        return;
+    }
+    
+    try {
+        // Запускаем Tone.js контекст
+        await Tone.start();
+        console.log('Tone.js контекст запущен');
+        
+        // Создаем эффекты
+        const reverb = new Tone.Reverb({
+            roomSize: 0.5,
+            wet: 0.2
+        }).toDestination();
+        await reverb.generate();
+        
+        // Создаем синтезированную версию "Never Gonna Give You Up"
+        // Если у вас есть MP3 файл, загрузите его в папку проекта (например, music/never-gonna-give-you-up.mp3)
+        // и раскомментируйте код ниже, заменив путь на ваш файл
+        
+        let player = null;
+        
+        // Попытка загрузить аудио файл (если он есть в проекте)
+        // const audioFile = 'music/never-gonna-give-you-up.mp3';
+        // try {
+        //     player = new Tone.Player({
+        //         url: audioFile,
+        //         loop: true,
+        //         volume: -3
+        //     }).connect(reverb);
+        //     await player.load();
+        //     console.log('Аудио файл загружен');
+        // } catch (e) {
+        //     console.log('Используем синтезированную версию');
+        //     player = await createNeverGonnaGiveYouUpSynth(reverb);
+        // }
+        
+        // Пока используем синтезированную версию
+        player = await createNeverGonnaGiveYouUpSynth(reverb);
+        
+        // Сохраняем ссылки для управления
+        musicPlayers = [player, reverb];
+        
+        // Запускаем музыку
+        if (musicEnabled) {
+            startMusicPlayback();
+        }
+        
+    } catch (error) {
+        console.error('Ошибка инициализации музыки:', error);
+    }
+}
+
+// Синтезированная версия "Never Gonna Give You Up"
+async function createNeverGonnaGiveYouUpSynth(reverb) {
+    // Основная мелодия "Never Gonna Give You Up"
+    // Ноты: G4, A4, B4, D5, B4, A4, G4, E4, D4, E4, G4, A4, B4, A4, G4
+    const melody = [
+        'G4', 'A4', 'B4', 'D5', 'B4', 'A4', 'G4', 'E4',
+        'D4', 'E4', 'G4', 'A4', 'B4', 'A4', 'G4', 'E4',
+        'G4', 'A4', 'B4', 'D5', 'B4', 'A4', 'G4', 'E4',
+        'D4', 'E4', 'G4', 'A4', 'B4', 'A4', 'G4', 'E4'
+    ];
+    
+    // Бас линия
+    const bass = [
+        'G2', 'G2', 'G2', 'G2', 'G2', 'G2', 'G2', 'G2',
+        'D2', 'D2', 'D2', 'D2', 'E2', 'E2', 'E2', 'E2',
+        'G2', 'G2', 'G2', 'G2', 'G2', 'G2', 'G2', 'G2',
+        'D2', 'D2', 'D2', 'D2', 'E2', 'E2', 'E2', 'E2'
+    ];
+    
+    // Аккорды
+    const chords = [
+        ['G3', 'B3', 'D4'], ['G3', 'B3', 'D4'], ['G3', 'B3', 'D4'], ['G3', 'B3', 'D4'],
+        ['G3', 'B3', 'D4'], ['G3', 'B3', 'D4'], ['G3', 'B3', 'D4'], ['G3', 'B3', 'D4'],
+        ['D3', 'F#3', 'A3'], ['D3', 'F#3', 'A3'], ['D3', 'F#3', 'A3'], ['D3', 'F#3', 'A3'],
+        ['E3', 'G3', 'B3'], ['E3', 'G3', 'B3'], ['E3', 'G3', 'B3'], ['E3', 'G3', 'B3'],
+        ['G3', 'B3', 'D4'], ['G3', 'B3', 'D4'], ['G3', 'B3', 'D4'], ['G3', 'B3', 'D4'],
+        ['G3', 'B3', 'D4'], ['G3', 'B3', 'D4'], ['G3', 'B3', 'D4'], ['G3', 'B3', 'D4'],
+        ['D3', 'F#3', 'A3'], ['D3', 'F#3', 'A3'], ['D3', 'F#3', 'A3'], ['D3', 'F#3', 'A3'],
+        ['E3', 'G3', 'B3'], ['E3', 'G3', 'B3'], ['E3', 'G3', 'B3'], ['E3', 'G3', 'B3']
+    ];
+    
+    const synthMelody = new Tone.PolySynth(Tone.Synth, {
+        oscillator: { type: 'sawtooth' },
+        envelope: { attack: 0.1, decay: 0.2, sustain: 0.7, release: 0.3 },
+        volume: -8
+    }).connect(reverb);
+    
+    const synthBass = new Tone.PolySynth(Tone.Synth, {
+        oscillator: { type: 'square' },
+        envelope: { attack: 0.05, decay: 0.1, sustain: 0.8, release: 0.2 },
+        volume: -10
+    }).connect(reverb);
+    
+    const synthChords = new Tone.PolySynth(Tone.Synth, {
+        oscillator: { type: 'triangle' },
+        envelope: { attack: 0.2, decay: 0.3, sustain: 0.5, release: 0.4 },
+        volume: -12
+    }).connect(reverb);
+    
+    let melodyIndex = 0;
+    let bassIndex = 0;
+    let chordIndex = 0;
+    
+    // Запускаем Transport
+    Tone.Transport.bpm.value = 113; // Оригинальный темп песни
+    
+    // Мелодия - восьмые ноты
+    const loopMelody = new Tone.Loop((time) => {
+        if (musicEnabled && isPlaying) {
+            synthMelody.triggerAttackRelease(melody[melodyIndex], '8n', time);
+            melodyIndex = (melodyIndex + 1) % melody.length;
+        }
+    }, '8n').start(0);
+    
+    // Бас - четвертные ноты
+    const loopBass = new Tone.Loop((time) => {
+        if (musicEnabled && isPlaying) {
+            synthBass.triggerAttackRelease(bass[bassIndex], '4n', time);
+            bassIndex = (bassIndex + 1) % bass.length;
+        }
+    }, '4n').start(0);
+    
+    // Аккорды - половинные ноты
+    const loopChords = new Tone.Loop((time) => {
+        if (musicEnabled && isPlaying) {
+            synthChords.triggerAttackRelease(chords[chordIndex], '2n', time);
+            chordIndex = (chordIndex + 1) % chords.length;
+        }
+    }, '2n').start(0);
+    
+    return {
+        start: () => {
+            Tone.Transport.start();
+            loopMelody.start(0);
+            loopBass.start(0);
+            loopChords.start(0);
+        },
+        stop: () => {
+            Tone.Transport.stop();
+            loopMelody.stop();
+            loopBass.stop();
+            loopChords.stop();
+            synthMelody.releaseAll();
+            synthBass.releaseAll();
+            synthChords.releaseAll();
+        }
+    };
+}
+
+function startMusicPlayback() {
+    if (musicPlayers.length === 0 || isPlaying) return;
+    
+    isPlaying = true;
+    
+    const player = musicPlayers[0];
+    
+    // Если это Tone.Player
+    if (player instanceof Tone.Player) {
+        if (player.loaded) {
+            player.start();
+            console.log('🎵 Never Gonna Give You Up запущена');
+        } else {
+            console.log('Ожидание загрузки аудио...');
+            player.onload = () => {
+                if (musicEnabled && isPlaying) {
+                    player.start();
+                    console.log('🎵 Never Gonna Give You Up запущена');
+                }
+            };
+        }
+    } else if (typeof player.start === 'function') {
+        // Если это синтезированная версия
+        player.start();
+        console.log('🎵 Never Gonna Give You Up (синтезированная) запущена');
+    }
+    
+    console.log('🎵 Музыка запущена');
+}
+
+function stopMusicPlayback() {
+    if (!isPlaying) return;
+    
+    isPlaying = false;
+    
+    const player = musicPlayers[0];
+    
+    // Если это Tone.Player
+    if (player instanceof Tone.Player) {
+        player.stop();
+    } else if (typeof player.stop === 'function') {
+        // Если это синтезированная версия
+        player.stop();
+    }
+    
+    // Останавливаем Transport если запущен
+    if (Tone.Transport.state === 'started') {
+        Tone.Transport.stop();
+    }
+    
+    console.log('🔇 Музыка остановлена');
+}
+
+function toggleMusic() {
+    musicEnabled = !musicEnabled;
+    localStorage.setItem('musicEnabled', musicEnabled.toString());
+    updateMusicState();
+    
+    if (musicEnabled) {
+        if (musicPlayers.length > 0) {
+            startMusicPlayback();
+        } else {
+            initMusic();
+        }
+        console.log('🎵 Музыка включена');
+    } else {
+        stopMusicPlayback();
+        console.log('🔇 Музыка выключена');
+    }
+}
+
+function updateMusicState() {
+    const musicToggleBtn = document.getElementById('musicToggleNav');
+    if (!musicToggleBtn) return;
+    
+    const musicIcon = musicToggleBtn.querySelector('.music-icon');
+    const musicIconMuted = musicToggleBtn.querySelector('.music-icon-muted');
+    
+    if (musicEnabled) {
+        musicToggleBtn.classList.add('active');
+        if (musicIcon) musicIcon.style.display = 'block';
+        if (musicIconMuted) musicIconMuted.style.display = 'none';
+    } else {
+        musicToggleBtn.classList.remove('active');
+        if (musicIcon) musicIcon.style.display = 'none';
+        if (musicIconMuted) musicIconMuted.style.display = 'block';
+    }
+}
+
 
 // ============================================
 // Initialize on Load
@@ -386,6 +713,9 @@ console.log('%cСоздано с ❤️ и кофе', 'font-size: 12px; color: #
 document.addEventListener('DOMContentLoaded', () => {
     // Add loaded class for any additional animations
     document.body.classList.add('loaded');
+    
+    // Initialize Strudel background music
+    initStrudelBackground();
     
     // Preload critical resources
     const criticalResources = [
